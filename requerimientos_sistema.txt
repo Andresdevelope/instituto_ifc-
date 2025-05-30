@@ -1,0 +1,51 @@
+Documento de Requerimientos del Sistema - Versión Detallada
+
+1. Introducción
+   1.1 Propósito del documento
+   1.2 Alcance del sistema
+   1.3 Definiciones, acrónimos y abreviaturas
+   1.4 Referencias
+
+2. Descripción General
+   2.1 Perspectiva del producto
+   2.2 Funcionalidades principales
+   2.3 Características de los usuarios
+   2.4 Restricciones generales
+
+3. Requerimientos Funcionales
+   3.1 Caso de uso 1: [Nombre del caso de uso]
+       - Descripción
+       - Actores involucrados
+       - Flujo principal
+       - Flujo alternativo
+       - Reglas de negocio asociadas
+   3.2 Caso de uso 2: [Nombre del caso de uso]
+       - ...
+
+4. Requerimientos No Funcionales
+   4.1 Requerimientos de rendimiento
+   4.2 Requerimientos de seguridad
+   4.3 Requerimientos de usabilidad
+   4.4 Requerimientos de disponibilidad
+   4.5 Requerimientos de mantenimiento
+
+5. Reglas de Negocio
+   - Descripción detallada de las reglas que rigen el sistema.
+
+6. Interfaces Externas
+   6.1 Interfaces de usuario
+   6.2 Interfaces de hardware
+   6.3 Interfaces de software
+   6.4 Interfaces de comunicación
+
+7. Suposiciones y Dependencias
+   - Suposiciones hechas durante el desarrollo
+   - Dependencias externas
+
+8. Criterios de Aceptación
+   - Condiciones que deben cumplirse para que el sistema sea aceptado.
+
+9. Anexos
+   - Documentos adicionales, diagramas, referencias, etc.
+
+Por favor, complete cada sección con la información correspondiente para un levantamiento de requerimientos completo y detallado.
