@@ -10,9 +10,21 @@ class FacilitadoresController extends Controller
     /**
      * Mostrar una lista de facilitadores.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $facilitadores = Facilitador::all();
+        $query = Facilitador::query();
+
+        if ($request->filled('busqueda')) {
+            $busqueda = $request->input('busqueda');
+            $query->where('nombre', 'like', "%$busqueda%")
+                  ->orWhere('materia', 'like', "%$busqueda%")
+                  ->orWhere('telefono', 'like', "%$busqueda%")
+                  ->orWhere('email', 'like', "%$busqueda%")
+                  ->orWhere('estado', 'like', "%$busqueda%")
+                  ;
+        }
+
+        $facilitadores = $query->paginate(10);
         return view('facilitadores.index', compact('facilitadores'));
     }
 
@@ -21,7 +33,7 @@ class FacilitadoresController extends Controller
      */
     public function create()
     {
-        return response()->json(['message' => 'Mostrar formulario para crear facilitador']);
+        return view('facilitadores.create');
     }
 
     /**
@@ -30,21 +42,20 @@ class FacilitadoresController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'email' => 'required|email|unique:facilitadores,email',
-            'telefono' => 'nullable|string|max:20',
-            'direccion' => 'nullable|string|max:255',
+            'nombre' => 'required|string|max:50',
+            'apellido' => 'required|string|max:50',
+            'cedula' => 'required|string|max:20',
+            'telefono' => 'required|string|max:11',
+            'email' => 'required|email|max:255|unique:facilitadores,email',
+            'materia' => 'required|string|max:100',
             'estado' => 'required|in:activo,inactivo',
-            'user_id' => 'required|exists:users,id|unique:facilitadores,user_id',
-            'rol_id' => 'required|exists:roles,id',
-            'especialidad' => 'nullable|string|max:255',
-            'biografia' => 'nullable|string',
         ]);
 
         $facilitador = Facilitador::create($validatedData);
 
-        return response()->json(['message' => 'Facilitador creado exitosamente', 'facilitador' => $facilitador], 201);
+        // Redirige a la lista de facilitadores con un mensaje de éxito en la sesión
+        return redirect()->route('facilitadores.index')
+            ->with('success', 'Facilitador creado exitosamente');
     }
 
     /**
@@ -62,7 +73,7 @@ class FacilitadoresController extends Controller
     public function edit($id)
     {
         $facilitador = Facilitador::findOrFail($id);
-        return response()->json(['message' => 'Mostrar formulario para editar facilitador', 'facilitador' => $facilitador]);
+        return view('facilitadores.edit', compact('facilitador'));
     }
 
     /**
@@ -73,21 +84,19 @@ class FacilitadoresController extends Controller
         $facilitador = Facilitador::findOrFail($id);
 
         $validatedData = $request->validate([
-            'nombre' => 'sometimes|required|string|max:255',
-            'apellido' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:facilitadores,email,' . $id,
-            'telefono' => 'nullable|string|max:20',
-            'direccion' => 'nullable|string|max:255',
-            'estado' => 'sometimes|required|in:activo,inactivo',
-            'user_id' => 'sometimes|required|exists:users,id|unique:facilitadores,user_id,' . $id,
-            'rol_id' => 'sometimes|required|exists:roles,id',
-            'especialidad' => 'nullable|string|max:255',
-            'biografia' => 'nullable|string',
+            'nombre' => 'required|string|max:50',
+            'apellido' => 'required|string|max:50',
+            'cedula' => 'required|string|max:20',
+            'telefono' => 'required|string|max:11',
+            'email' => 'required|email|max:255|unique:facilitadores,email,' . $id,
+            'materia' => 'required|string|max:100',
+            'estado' => 'required|in:activo,inactivo',
         ]);
 
         $facilitador->update($validatedData);
 
-        return response()->json(['message' => 'Facilitador actualizado exitosamente', 'facilitador' => $facilitador]);
+        return redirect()->route('facilitadores.index')
+            ->with('success', 'Facilitador actualizado exitosamente');
     }
 
     /**
@@ -98,6 +107,7 @@ class FacilitadoresController extends Controller
         $facilitador = Facilitador::findOrFail($id);
         $facilitador->delete();
 
-        return response()->json(['message' => 'Facilitador eliminado exitosamente']);
+        return redirect()->route('facilitadores.index')
+            ->with('success', 'Facilitador eliminado exitosamente');
     }
 }

@@ -19,14 +19,10 @@ class Facilitador extends Model
     protected $fillable = [
         'nombre',
         'apellido',
-        'email',
+        'cedula',
+        'materia',
         'telefono',
-        'direccion',
-        'estado',
-        'user_id',
-        'rol_id',
-        'especialidad',
-        'biografia',
+        'email',
     ];
 
     // Relación con usuario
