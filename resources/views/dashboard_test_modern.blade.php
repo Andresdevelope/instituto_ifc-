@@ -1,11 +1,11 @@
 @extends('layouts.app_sidebar_modern')
 
-@section('title', 'Dashboard Test Moderno')
+@section('title', 'Dashboard ')
 
 @section('content')
     <div class="p-6">
-        <h1 class="text-3xl font-extrabold mb-8 text-gray-800">Dashboard Moderno con Animaciones</h1>
-        <p class="mb-8 text-gray-600">Navega a las diferentes secciones con este diseño moderno y animado.</p>
+        <h1 class="text-3xl font-extrabold mb-8 text-gray-800">Bienvenido al Sistema de Gestión Académica IFC</h1>
+        <p class="mb-8 text-gray-600">Administra estudiantes, facilitadores, materias y notas de manera eficiente y moderna. Explora las secciones del menú para gestionar toda la información académica del Instituto IFC de forma centralizada, segura y rápida.</p>
 
         <style>
             .card-container {
