@@ -160,12 +160,6 @@
 
     <h1 class="text-2xl font-bold mb-4">Listado de Estudiantes</h1>
 
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="flex justify-between mb-4">
         <form id="searchForm" action="{{ route('estudiantes.index') }}" method="GET" class="flex space-x-2 items-end">
             <input id="searchInput" type="text" name="search" value="{{ $query ?? '' }}" placeholder="Buscar estudiante por nombre, apellido o cédula" class="border border-gray-300 rounded px-4 py-3 h-12 w-72 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />

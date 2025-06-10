@@ -7,12 +7,6 @@
 
     <h1 class="text-3xl font-bold mb-8 text-center">Registrar Nuevo Estudiante</h1>
 
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 max-w-4xl mx-auto">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <form action="{{ route('estudiantes.store') }}" method="POST" class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-8">
         @csrf
 

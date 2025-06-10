@@ -123,11 +123,13 @@ class EstudiantesController extends Controller
     public function destroy($id)
     {
         $estudiante = Estudiante::findOrFail($id);
-        $estudiante->delete();
-        //cambiar el mensaje de exito
-        // Redirigir a la lista de estudiantes con mensaje de éxito
-        //use redirect para redirigir a una ruta, co with para mostrar un mensaje de éxito.
-        return redirect()->route('estudiantes.index')->with('success', 'Estudiante eliminado exitosamente');
-        
+        try {
+            // Eliminar primero las notas asociadas
+            $estudiante->notas()->delete();
+            $estudiante->delete();
+            return redirect()->route('estudiantes.index')->with('success', 'Estudiante y sus notas eliminados exitosamente');
+        } catch (\Exception $e) {
+            return redirect()->route('estudiantes.index')->with('error', 'No se pudo eliminar el estudiante porque tiene registros asociados.');
+        }
     }
 }
