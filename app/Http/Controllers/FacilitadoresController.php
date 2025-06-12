@@ -12,16 +12,22 @@ class FacilitadoresController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Facilitador::query();
+        $query = Facilitador::with('materias'); // Eager loading de materias
 
         if ($request->filled('busqueda')) {
             $busqueda = $request->input('busqueda');
-            $query->where('nombre', 'like', "%$busqueda%")
-                  ->orWhere('materia', 'like', "%$busqueda%")
+            $query->where(function($q) use ($busqueda) {
+                $q->where('nombre', 'like', "%$busqueda%")
                   ->orWhere('telefono', 'like', "%$busqueda%")
                   ->orWhere('email', 'like', "%$busqueda%")
                   ->orWhere('estado', 'like', "%$busqueda%")
-                  ;
+                  // Buscar también por nombre de materia relacionada
+                  ->orWhereHas('materias', function($q2) use ($busqueda) {
+                      $q2->where('nombre', 'like', "%$busqueda%")
+                         ->orWhere('codigo', 'like', "%$busqueda%")
+                         ;
+                  });
+            });
         }
 
         $facilitadores = $query->paginate(10);
@@ -47,15 +53,25 @@ class FacilitadoresController extends Controller
             'cedula' => 'required|string|max:20',
             'telefono' => 'required|string|max:11',
             'email' => 'required|email|max:255|unique:facilitadores,email',
-            'materia' => 'required|string|max:100',
             'estado' => 'required|in:activo,inactivo',
+            // 'materia' eliminado
+            'materias' => 'required|array',
+            'materias.*' => 'exists:materias,id',
         ]);
 
         $facilitador = Facilitador::create($validatedData);
 
-        // Redirige a la lista de facilitadores con un mensaje de éxito en la sesión
+        // Asignar las materias seleccionadas a este facilitador
+        foreach ($request->materias as $materiaId) {
+            $materia = \App\Models\Materia::find($materiaId);
+            if ($materia) {
+                $materia->facilitador_id = $facilitador->id;
+                $materia->save();
+            }
+        }
+
         return redirect()->route('facilitadores.index')
-            ->with('success', 'Facilitador creado exitosamente');
+            ->with('success', 'Facilitador creado exitosamente y materias asignadas.');
     }
 
     /**
@@ -63,8 +79,22 @@ class FacilitadoresController extends Controller
      */
     public function show($id)
     {
-        $facilitador = Facilitador::findOrFail($id);
-        return response()->json($facilitador);
+        $facilitador = Facilitador::with('materias')->findOrFail($id);
+        // Devolver datos del facilitador y las materias asociadas
+        return response()->json([
+            'nombre' => $facilitador->nombre,
+            'apellido' => $facilitador->apellido,
+            'telefono' => $facilitador->telefono,
+            'email' => $facilitador->email,
+            'estado' => $facilitador->estado,
+            'direccion' => $facilitador->direccion ?? null,
+            'materias' => $facilitador->materias->map(function($m) {
+                return [
+                    'nombre' => $m->nombre,
+                    'codigo' => $m->codigo
+                ];
+            }),
+        ]);
     }
 
     /**
@@ -72,8 +102,10 @@ class FacilitadoresController extends Controller
      */
     public function edit($id)
     {
-        $facilitador = Facilitador::findOrFail($id);
-        return view('facilitadores.edit', compact('facilitador'));
+        $facilitador = Facilitador::with('materias')->findOrFail($id);
+        $materias = \App\Models\Materia::orderBy('nombre')->get();
+        $materiasAsignadas = $facilitador->materias->pluck('id')->toArray();
+        return view('facilitadores.edit', compact('facilitador', 'materias', 'materiasAsignadas'));
     }
 
     /**
@@ -89,11 +121,23 @@ class FacilitadoresController extends Controller
             'cedula' => 'required|string|max:20',
             'telefono' => 'required|string|max:11',
             'email' => 'required|email|max:255|unique:facilitadores,email,' . $id,
-            'materia' => 'required|string|max:100',
             'estado' => 'required|in:activo,inactivo',
+            'materias' => 'required|array',
+            'materias.*' => 'exists:materias,id',
         ]);
 
         $facilitador->update($validatedData);
+
+        // Desasignar todas las materias actuales de este facilitador
+        \App\Models\Materia::where('facilitador_id', $facilitador->id)->update(['facilitador_id' => null]);
+        // Asignar solo las materias seleccionadas
+        foreach ($request->materias as $materiaId) {
+            $materia = \App\Models\Materia::find($materiaId);
+            if ($materia) {
+                $materia->facilitador_id = $facilitador->id;
+                $materia->save();
+            }
+        }
 
         return redirect()->route('facilitadores.index')
             ->with('success', 'Facilitador actualizado exitosamente');

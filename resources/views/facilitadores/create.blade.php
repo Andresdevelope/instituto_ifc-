@@ -47,10 +47,19 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="materia" class="block font-medium mb-1">Asignatura</label>
-                    <input type="text" name="materia" id="materia" value="{{ old('materia') }}" required
-                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ejemplo: Biblia, Teología, Música" />
-                    @error('materia')
+                    <label class="block font-medium mb-1">Materias a impartir <span class="text-red-500">*</span></label>
+                    <div class="flex flex-wrap gap-2 overflow-x-auto py-2">
+                        @foreach(App\Models\Materia::whereNull('facilitador_id')->orderBy('nombre')->get() as $materia)
+                            <label class="inline-flex items-center bg-indigo-50 border border-indigo-300 rounded-full px-4 py-2 cursor-pointer hover:bg-indigo-100 transition">
+                                <input type="checkbox" name="materias[]" value="{{ $materia->id }}" class="form-checkbox text-indigo-600 mr-2"
+                                    {{ in_array($materia->id, old('materias', [])) ? 'checked' : '' }}>
+                                <span class="font-semibold text-indigo-800">{{ $materia->nombre }}</span>
+                                <span class="ml-2 text-xs bg-indigo-200 text-indigo-700 rounded px-2 py-0.5">{{ $materia->codigo }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <small class="text-gray-500 block mt-1">Desliza para ver más materias en móvil.</small>
+                    @error('materias')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -89,9 +98,26 @@
         </section>
         <div class="mt-8 flex justify-center">
             <button type="submit"
-                class="bg-blue-800 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition duration-300">
+                class="bg-blue-800 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition duration-300" style="cursor: pointer" >
                 Registrar
             </button>
         </div>
     </form>
+
+    @push('styles')
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    @endpush
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                $('#materias').select2({
+                    placeholder: 'Selecciona materias',
+                    width: '100%',
+                    allowClear: true,
+                    language: 'es'
+                });
+            });
+        </script>
+    @endpush
 @endsection

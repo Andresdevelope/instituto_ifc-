@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Materia;
+use App\Models\Facilitador;
 use Illuminate\Http\Request;
 
 class MateriasController extends Controller
@@ -12,10 +13,34 @@ class MateriasController extends Controller
      */
     //porque la funcion index no tiene el id como parametro
     //porque no se necesita un id para mostrar todas las materias
-    public function index()
+    public function index(Request $request)
     {
-        $materias = Materia::all();
-        return view('materias.index', compact('materias'));
+        // Obtener lista de facilitadores para el filtro
+        $facilitadores = Facilitador::orderBy('nombre')->get();
+
+        // Filtros
+        $query = Materia::query();
+
+        // Búsqueda por nombre o código
+        if ($request->filled('busqueda')) {
+            $busqueda = $request->input('busqueda');
+            $query->where(function($q) use ($busqueda) {
+                $q->where('nombre', 'like', "%$busqueda%")
+                  ->orWhere('codigo', 'like', "%$busqueda%" );
+            });
+        }
+        // Filtro por estado
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->input('estado'));
+        }
+        // Filtro por facilitador
+        if ($request->filled('facilitador_id')) {
+            $query->where('facilitador_id', $request->input('facilitador_id'));
+        }
+        // Cargar relación facilitador para la vista
+        $materias = $query->with('facilitador')->get();
+
+        return view('materias.index', compact('materias', 'facilitadores'));
     }
 
     /**

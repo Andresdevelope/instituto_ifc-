@@ -176,7 +176,7 @@
                 const notif = document.getElementById('notification-success');
                 if (notif) notif.style.display = 'none';
             }, 3500);
-        </script>
+        </script> 
     @endif
     @if(session('error'))
         <div id="notification-error" class="fixed top-6 right-6 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">

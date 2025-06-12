@@ -57,14 +57,6 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="materia" class="block font-medium mb-1">Materia</label>
-                    <input type="text" id="materia" name="materia" value="{{ old('materia', $facilitador->materia) }}" required
-                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    @error('materia')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div class="mb-4">
                     <label for="estado" class="block font-medium mb-1">Estado</label>
                     <select id="estado" name="estado" required
                         class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -75,10 +67,27 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                <div class="mb-4">
+                    <label for="materias" class="block font-medium mb-1">Materias a impartir <span class="text-red-500">*</span></label>
+                    <select name="materias[]" id="materias" multiple required
+                        class="w-full border border-indigo-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-indigo-50 text-indigo-900 shadow-sm">
+                        @foreach($materias as $materia)
+                            <option value="{{ $materia->id }}" {{ in_array($materia->id, $materiasAsignadas) ? 'selected' : '' }}>
+                                {{ $materia->nombre }} ({{ $materia->codigo }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="text-gray-500">Selecciona una o varias materias. Usa Ctrl/Cmd para seleccionar varias.</small>
+                    @error('materias')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                
             </div>
         </section>
         <div class="mt-8 flex justify-center gap-4">
-            <button type="submit" class="bg-blue-800 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition duration-300">
+            <button type="submit" class="bg-blue-800 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition duration-300"
+            style="cursor: pointer;">
                 Guardar
             </button>
             <a href="{{ route('facilitadores.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-8 py-3 rounded-lg shadow-lg transition duration-300">Cancelar</a>

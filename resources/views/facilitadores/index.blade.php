@@ -159,7 +159,15 @@
                 @forelse($facilitadores as $facilitador)
                     <tr>
                         <td>{{ $facilitador->nombre }}</td>
-                        <td>{{ $facilitador->materia }}</td>
+                        <td>
+                            @if($facilitador->materias && $facilitador->materias->count())
+                                @foreach($facilitador->materias as $materia)
+                                    <span class="inline-block bg-indigo-100 text-indigo-800 text-xs font-semibold mr-1 mb-1 px-2.5 py-0.5 rounded">{{ $materia->nombre }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-gray-400 text-xs">Sin materias asignadas</span>
+                            @endif
+                        </td>
                         <td>{{ $facilitador->telefono ?? '-' }}</td>
                         <td>
                             @if($facilitador->estado === 'activo')
@@ -287,10 +295,16 @@
             fetch(`/facilitadores/${id}`)
                 .then(response => response.json())
                 .then(data => {
+                    let materiasHtml = '';
+                    if (data.materias && data.materias.length > 0) {
+                        materiasHtml = data.materias.map(m => `<span class='inline-block bg-indigo-100 text-indigo-800 text-xs font-semibold mr-1 mb-1 px-2.5 py-0.5 rounded'>${m.nombre} (${m.codigo})</span>`).join(' ');
+                    } else {
+                        materiasHtml = `<span class='text-gray-400 text-xs'>Sin materias asignadas</span>`;
+                    }
                     let html = `
                         <div><strong>Nombre:</strong> ${data.nombre ?? '-'} </div>
                         <div><strong>Apellido:</strong> ${data.apellido ?? '-'} </div>
-                        <div><strong>Asignatura:</strong> ${data.materia ?? '-'} </div>
+                        <div><strong>Materias que imparte:</strong> ${materiasHtml}</div>
                         <div><strong>Teléfono:</strong> ${data.telefono ?? '-'} </div>
                         <div><strong>Email:</strong> ${data.email ?? '-'} </div>
                         <div><strong>Estado:</strong> <span class='${data.estado === 'activo' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} px-2 py-1 rounded-full text-xs font-semibold'>${data.estado}</span></div>

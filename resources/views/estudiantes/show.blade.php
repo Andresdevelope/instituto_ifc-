@@ -3,37 +3,24 @@
 @section('title', 'Detalle del Estudiante')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Detalle del Estudiante</h1>
-
-    <div class="bg-white shadow rounded-lg p-6">
-        <div class="mb-4">
-            <strong>Nombre:</strong> {{ $estudiante->nombre }}
+<div class="max-w-3xl mx-auto bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl shadow-xl p-10 mt-8">
+    <div class="flex flex-col sm:flex-row items-center gap-8">
+        <div class="flex-1">
+            <h2 class="text-3xl font-bold text-blue-800 mb-2">{{ $estudiante->nombre }} {{ $estudiante->apellido }}</h2>
+            <p class="text-gray-600 mb-4">{{ $estudiante->correo }}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><span class="font-semibold">Cédula:</span> {{ $estudiante->cedula }}</div>
+                <div><span class="font-semibold">Estado:</span> {{ $estudiante->estado }}</div>
+                <div><span class="font-semibold">Género:</span> {{ $estudiante->genero }}</div>
+                <div><span class="font-semibold">Edad:</span> {{ $estudiante->edad }}</div>
+                <div><span class="font-semibold">Nacimiento:</span> {{ $estudiante->fecha_nacimiento }}</div>
+                <div><span class="font-semibold">Teléfono:</span> {{ $estudiante->telefono }}</div>
+            </div>
         </div>
-        <div class="mb-4">
-            <strong>Apellido:</strong> {{ $estudiante->apellido }}
+        <div>
+            <img src="/icons/graduado.png" alt="Avatar" class="w-32 h-32 rounded-full border-4 border-blue-300 shadow-lg">
         </div>
-        <div class="mb-4">
-            <strong>Cédula:</strong> {{ $estudiante->cedula }}
-        </div>
-        <div class="mb-4">
-            <strong>Estado:</strong> {{ $estudiante->estado }}
-        </div>
-        <div class="mb-4">
-            <strong>Género:</strong> {{ $estudiante->genero }}
-        </div>
-        <div class="mb-4">
-            <strong>Edad:</strong> {{ $estudiante->edad }}
-        </div>
-        <div class="mb-4">
-            <strong>Fecha de Nacimiento:</strong> {{ $estudiante->fecha_nacimiento }}
-        </div>
-        <div class="mb-4">
-            <strong>Teléfono:</strong> {{ $estudiante->telefono }}
-        </div>
-        <div class="mb-4">
-            <strong>Correo:</strong> {{ $estudiante->correo }}
-        </div>
-
-        <a href="{{ route('estudiantes.index') }}" class="inline-block mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Volver al listado</a>
     </div>
+    <a href="{{ route('estudiantes.index') }}" class="mt-8 inline-block px-8 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-900 transition">Volver</a>
+</div>
 @endsection
