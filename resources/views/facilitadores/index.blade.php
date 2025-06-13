@@ -8,17 +8,6 @@
         <h1 class="text-2xl font-bold">Listado de Facilitadores</h1>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {{ session('error') }}
-        </div>
-    @endif
-
     <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-6 gap-4">
         <form id="searchForm" method="GET" action="{{ route('facilitadores.index') }}" class="flex space-x-2 items-end w-full md:w-auto">
             <input id="searchInput" type="text" name="busqueda" value="{{ request('busqueda') }}" placeholder="Buscar facilitador por nombre, asignatura o contacto" class="search-bar" />
@@ -170,7 +159,15 @@
                 @forelse($facilitadores as $facilitador)
                     <tr>
                         <td>{{ $facilitador->nombre }}</td>
-                        <td>{{ $facilitador->materia }}</td>
+                        <td>
+                            @if($facilitador->materias && $facilitador->materias->count())
+                                @foreach($facilitador->materias as $materia)
+                                    <span class="inline-block bg-indigo-100 text-indigo-800 text-xs font-semibold mr-1 mb-1 px-2.5 py-0.5 rounded">{{ $materia->nombre }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-gray-400 text-xs">Sin materias asignadas</span>
+                            @endif
+                        </td>
                         <td>{{ $facilitador->telefono ?? '-' }}</td>
                         <td>
                             @if($facilitador->estado === 'activo')
@@ -181,26 +178,17 @@
                         </td>
                         <td>
                             <div class="flex space-x-2 items-center">
-                                <button type="button" class="button" title="Ver" onclick="mostrarModalFacilitador({{ $facilitador->id }})">
-                                    Ver
-                                    <div class="arrow-wrapper">
-                                        <div class="arrow"></div>
-                                    </div>
+                                <button type="button" class="action-icon-btn action-view" title="Ver" onclick="mostrarModalFacilitador({{ $facilitador->id }})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                 </button>
-                                <a href="{{ route('facilitadores.edit', $facilitador->id) }}" class="button" title="Editar">
-                                    Editar
-                                    <div class="arrow-wrapper">
-                                        <div class="arrow"></div>
-                                    </div>
+                                <a href="{{ route('facilitadores.edit', $facilitador->id) }}" class="action-icon-btn action-edit" title="Editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 00-4-4l-8 8v3z" /></svg>
                                 </a>
                                 <form id="deleteForm-{{ $facilitador->id }}" action="{{ route('facilitadores.destroy', $facilitador->id) }}" method="POST" style="display:inline; margin:0;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="button" title="Eliminar" onclick="abrirModalEliminar({{ $facilitador->id }}, '{{ $facilitador->nombre }}', '{{ $facilitador->apellido }}')">
-                                        Eliminar
-                                        <div class="arrow-wrapper">
-                                            <div class="arrow"></div>
-                                        </div>
+                                    <button type="button" class="action-icon-btn action-delete" title="Eliminar" onclick="abrirModalEliminar({{ $facilitador->id }}, '{{ $facilitador->nombre }}', '{{ $facilitador->apellido }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                     </button>
                                 </form>
                             </div>
@@ -255,16 +243,68 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fade-in 0.3s ease; }
+        .action-icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 1px 2px 0 rgba(60,60,60,0.04);
+        }
+        .action-icon-btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            pointer-events: none;
+        }
+        .action-icon-btn:hover {
+            background: #e0e7ff;
+            color: #645bff;
+            box-shadow: 0 2px 8px 0 rgba(100,91,255,0.10);
+        }
+        .action-view {
+            color: #2563eb;
+        }
+        .action-view:hover {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .action-edit {
+            color: #f59e42;
+        }
+        .action-edit:hover {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .action-delete {
+            color: #dc2626;
+        }
+        .action-delete:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
     </style>
     <script>
         function mostrarModalFacilitador(id) {
             fetch(`/facilitadores/${id}`)
                 .then(response => response.json())
                 .then(data => {
+                    let materiasHtml = '';
+                    if (data.materias && data.materias.length > 0) {
+                        materiasHtml = data.materias.map(m => `<span class='inline-block bg-indigo-100 text-indigo-800 text-xs font-semibold mr-1 mb-1 px-2.5 py-0.5 rounded'>${m.nombre} (${m.codigo})</span>`).join(' ');
+                    } else {
+                        materiasHtml = `<span class='text-gray-400 text-xs'>Sin materias asignadas</span>`;
+                    }
                     let html = `
                         <div><strong>Nombre:</strong> ${data.nombre ?? '-'} </div>
                         <div><strong>Apellido:</strong> ${data.apellido ?? '-'} </div>
-                        <div><strong>Asignatura:</strong> ${data.materia ?? '-'} </div>
+                        <div><strong>Materias que imparte:</strong> ${materiasHtml}</div>
                         <div><strong>Teléfono:</strong> ${data.telefono ?? '-'} </div>
                         <div><strong>Email:</strong> ${data.email ?? '-'} </div>
                         <div><strong>Estado:</strong> <span class='${data.estado === 'activo' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} px-2 py-1 rounded-full text-xs font-semibold'>${data.estado}</span></div>

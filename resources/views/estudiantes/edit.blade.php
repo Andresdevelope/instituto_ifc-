@@ -95,7 +95,7 @@
         </section>
 
         <div class="mt-8 flex justify-center">
-            <button type="submit" class="bg-blue-800 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition duration-300">
+            <button type="submit" class="bg-blue-800 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition duration-300" style="cursor:pointer;">
                 Guardar
             </button>
         </div>

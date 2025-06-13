@@ -156,15 +156,57 @@
                 font-size: 0.95rem;
             }
         }
+
+        /* Botones de acción estilo facilitadores */
+        .action-icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 1px 2px 0 rgba(60,60,60,0.04);
+        }
+        .action-icon-btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            pointer-events: none;
+        }
+        .action-icon-btn:hover {
+            background: #e0e7ff;
+            color: #645bff;
+            box-shadow: 0 2px 8px 0 rgba(100,91,255,0.10);
+        }
+        .action-view {
+            color: #2563eb;
+        }
+        .action-view:hover {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .action-edit {
+            color: #f59e42;
+        }
+        .action-edit:hover {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .action-delete {
+            color: #dc2626;
+        }
+        .action-delete:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
     </style>
 
     <h1 class="text-2xl font-bold mb-4">Listado de Estudiantes</h1>
-
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
-            {{ session('success') }}
-        </div>
-    @endif
 
     <div class="flex justify-between mb-4">
         <form id="searchForm" action="{{ route('estudiantes.index') }}" method="GET" class="flex space-x-2 items-end">
@@ -216,26 +258,24 @@
                         <td>{{ $estudiante->cedula }}</td>
                         <td>
                             <div class="flex space-x-2 items-center">
-                                <a href="{{ route('estudiantes.show', $estudiante->id) }}" class="button" title="Ver">
-                                    Ver
-                                    <div class="arrow-wrapper">
-                                        <div class="arrow"></div>
-                                    </div>
+                                <a href="{{ route('estudiantes.show', $estudiante->id) }}" class="action-icon-btn action-view" title="Ver">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                 </a>
-                                <a href="{{ route('estudiantes.edit', $estudiante->id) }}" class="button" title="Editar">
-                                    Editar
-                                    <div class="arrow-wrapper">
-                                        <div class="arrow"></div>
-                                    </div>
+                                <a href="{{ route('estudiantes.edit', $estudiante->id) }}" class="action-icon-btn action-edit" title="Editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 00-4-4l-8 8v3z" /></svg>
                                 </a>
-                                <form action="{{ route('estudiantes.destroy', $estudiante->id) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este estudiante?');" style="display:inline; margin:0;">
+                                <form id="deleteForm-{{ $estudiante->id }}" action="{{ route('estudiantes.destroy', $estudiante->id) }}" method="POST" style="display:inline; margin:0;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="button" title="Eliminar">
-                                        Eliminar
-                                        <div class="arrow-wrapper">
-                                            <div class="arrow"></div>
-                                        </div>
+                                    <button type="submit" class="action-icon-btn action-delete" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar este estudiante?');">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span style="position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+                                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                                <path d="M6 6l8 8M6 14L14 6" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </span>
                                     </button>
                                 </form>
                             </div>

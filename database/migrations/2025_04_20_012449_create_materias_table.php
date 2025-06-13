@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('estado', ['activa', 'inactiva'])->default('activa');
             
             // Relaciones con otras tablas
-            $table->unsignedBigInteger('facilitador_id');
+            $table->unsignedBigInteger('facilitador_id')();
             $table->foreign('facilitador_id')
                   ->references('id')
                   ->on('facilitadores')
