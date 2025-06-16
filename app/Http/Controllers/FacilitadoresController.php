@@ -80,21 +80,7 @@ class FacilitadoresController extends Controller
     public function show($id)
     {
         $facilitador = Facilitador::with('materias')->findOrFail($id);
-        // Devolver datos del facilitador y las materias asociadas
-        return response()->json([
-            'nombre' => $facilitador->nombre,
-            'apellido' => $facilitador->apellido,
-            'telefono' => $facilitador->telefono,
-            'email' => $facilitador->email,
-            'estado' => $facilitador->estado,
-            'direccion' => $facilitador->direccion ?? null,
-            'materias' => $facilitador->materias->map(function($m) {
-                return [
-                    'nombre' => $m->nombre,
-                    'codigo' => $m->codigo
-                ];
-            }),
-        ]);
+        return view('facilitadores.show', compact('facilitador'));
     }
 
     /**

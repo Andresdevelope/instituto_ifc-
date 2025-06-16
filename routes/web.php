@@ -37,5 +37,9 @@ Route::put('/facilitadores/{id}', [FacilitadoresController::class, 'update'])->n
 Route::delete('/facilitadores/{id}', [FacilitadoresController::class, 'destroy'])->name('facilitadores.destroy');
 
 Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
+Route::get('/materias/create', [MateriasController::class, 'create'])->name('materias.create');
+Route::post('/materias', [MateriasController::class, 'store'])->name('materias.store');
+Route::delete('/materias/{id}', [MateriasController::class, 'destroy'])->name('materias.destroy');
+
 Route::get('/notas', [NotasController::class, 'index'])->name('notas.index');
 Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');

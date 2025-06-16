@@ -7,7 +7,7 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Listado de Facilitadores</h1>
     </div>
-
+        
     <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-6 gap-4">
         <form id="searchForm" method="GET" action="{{ route('facilitadores.index') }}" class="flex space-x-2 items-end w-full md:w-auto">
             <input id="searchInput" type="text" name="busqueda" value="{{ request('busqueda') }}" placeholder="Buscar facilitador por nombre, asignatura o contacto" class="search-bar" />

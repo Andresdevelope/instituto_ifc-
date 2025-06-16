@@ -27,8 +27,10 @@ class MateriasPensumSeeder extends Seeder
             ['nombre' => 'Homiletica', 'codigo' => 'HOM302', 'estado' => 'activa'],
             ['nombre' => 'Sectas Y Religiones', 'codigo' => 'SYR303', 'estado' => 'activa'],
         ];
-
-        foreach ($materias as $materia) {
+            // que significa el foreach?. 
+        // El foreach itera sobre cada elemento del array $materias y ejecuta el bloque de código para cada uno de ellos.
+        // El bloque de código dentro del foreach crea una nueva instancia del modelo Materia y la guarda en la base de datos.
+            foreach ($materias as $materia) {
             Materia::create($materia);
         }
     }
