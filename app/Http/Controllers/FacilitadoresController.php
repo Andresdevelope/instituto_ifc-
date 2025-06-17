@@ -80,6 +80,9 @@ class FacilitadoresController extends Controller
     public function show($id)
     {
         $facilitador = Facilitador::with('materias')->findOrFail($id);
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($facilitador);
+        }
         return view('facilitadores.show', compact('facilitador'));
     }
 

@@ -51,4 +51,12 @@ class Materia extends Model
     {
         return $this->hasMany(Nota::class);
     }
+
+    // Relación muchos a muchos con estudiantes
+    public function estudiantes()
+    {
+        return $this->belongsToMany(Estudiante::class, 'estudiante_materia')
+            ->withPivot('fecha_inscripcion')
+            ->withTimestamps();
+    }
 }

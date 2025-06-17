@@ -42,4 +42,17 @@ Route::post('/materias', [MateriasController::class, 'store'])->name('materias.s
 Route::delete('/materias/{id}', [MateriasController::class, 'destroy'])->name('materias.destroy');
 
 Route::get('/notas', [NotasController::class, 'index'])->name('notas.index');
+Route::get('/notas/create', [NotasController::class, 'create'])->name('notas.create');
+Route::post('/notas', [NotasController::class, 'store'])->name('notas.store');
+Route::get('/notas/{id}/edit', [NotasController::class, 'edit'])->name('notas.edit');
+Route::put('/notas/{id}', [NotasController::class, 'update'])->name('notas.update');
+Route::delete('/notas/{id}', [NotasController::class, 'destroy'])->name('notas.destroy');
+
+// Rutas para asignar estudiantes a materia desde el módulo de notas
+Route::get('/notas/{materia_id}/asignar-estudiantes', [NotasController::class, 'asignarEstudiantesForm'])->name('notas.asignarEstudiantes');
+Route::post('/notas/{materia_id}/asignar-estudiantes', [NotasController::class, 'asignarEstudiantesStore'])->name('notas.asignarEstudiantes.store');
+
+// Ruta para mostrar el detalle de una materia en el módulo de notas
+Route::get('/notas/materia/{materia}', [NotasController::class, 'showMateria'])->name('notas.materia.show');
+
 Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');

@@ -59,7 +59,9 @@ class MateriasController extends Controller
      */
     public function create()
     {
-        return response()->json(['message' => 'Mostrar formulario para crear materia']);
+        // Obtener todos los facilitadores para el select
+        $facilitadores = Facilitador::orderBy('nombre')->get();
+        return view('materias.create', compact('facilitadores'));
     }
 
     /**
