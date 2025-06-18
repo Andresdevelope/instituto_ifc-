@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Nota;
+use App\Models\Materia;
 
 class Estudiante extends Model
 {
@@ -36,6 +37,14 @@ class Estudiante extends Model
     public function notas()
     {
         return $this->hasMany(Nota::class);
+    }
+
+    // Relación muchos a muchos con materias
+    public function materias()
+    {
+        return $this->belongsToMany(Materia::class, 'estudiante_materia')
+            ->withPivot('fecha_inscripcion')
+            ->withTimestamps();
     }
 }
 

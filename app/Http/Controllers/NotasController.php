@@ -3,17 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Nota;
+use App\Models\Materia;
+use App\Models\Estudiante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NotasController extends Controller
 {
     /**
      * Mostrar una lista de notas.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $notas = Nota::all();
-        return view('notas.index', compact('notas'));
+        $materias = Materia::all();
+        $notas = collect();
+        $estudiantes = collect();
+
+        $materiaId = $request->input('materia_id');
+        if ($materiaId) {
+            $materia = Materia::find($materiaId);
+            if ($materia) {
+                $estudiantes = $materia->estudiantes;
+                $notas = Nota::where('materia_id', $materiaId)->get();
+            }
+        } else {
+            $notas = Nota::all();
+        }
+
+        return view('notas.index', compact('materias', 'notas', 'estudiantes'));
     }
 
     /**
@@ -89,5 +106,47 @@ class NotasController extends Controller
         $nota->delete();
 
         return response()->json(['message' => 'Nota eliminada exitosamente']);
+    }
+
+    /**
+     * Mostrar modal para asignar estudiantes a una materia.
+     */
+    public function asignarEstudiantesForm(Request $request, $materia_id)
+    {
+        $materia = Materia::findOrFail($materia_id);
+        // Estudiantes ya inscritos en la materia
+        $inscritos = $materia->estudiantes->pluck('id')->toArray();
+        // Estudiantes disponibles (no inscritos en la materia)
+        $estudiantes = Estudiante::whereNotIn('id', $inscritos)->get();
+        return view('notas.asignar_estudiantes', compact('materia', 'estudiantes'));
+    }
+
+    /**
+     * Procesar la asignación de estudiantes a una materia.
+     */
+    public function asignarEstudiantesStore(Request $request, $materia_id)
+    {
+        $materia = Materia::findOrFail($materia_id);
+        $request->validate([
+            'estudiantes' => 'required|array',
+            'estudiantes.*' => 'exists:estudiantes,id',
+        ]);
+        // Asignar estudiantes seleccionados a la materia (sin quitar los ya inscritos)
+        $materia->estudiantes()->syncWithoutDetaching($request->estudiantes);
+        return redirect()->route('notas.index', ['materia_id' => $materia_id])
+            ->with('success', 'Estudiantes asignados correctamente.');
+    }
+
+    /**
+     * Mostrar el detalle de una materia con sus estudiantes y notas.
+     */
+    public function showMateria($materia_id)
+    {
+        $materia = Materia::with('estudiantes')->findOrFail($materia_id);
+        $notas = Nota::where('materia_id', $materia_id)->get();
+        // Para el modal: estudiantes no inscritos
+        $inscritos = $materia->estudiantes->pluck('id')->toArray();
+        $estudiantesDisponibles = Estudiante::whereNotIn('id', $inscritos)->get();
+        return view('notas.show_materia', compact('materia', 'notas', 'estudiantesDisponibles'));
     }
 }

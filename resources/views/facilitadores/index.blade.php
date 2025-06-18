@@ -7,7 +7,7 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Listado de Facilitadores</h1>
     </div>
-
+        
     <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-6 gap-4">
         <form id="searchForm" method="GET" action="{{ route('facilitadores.index') }}" class="flex space-x-2 items-end w-full md:w-auto">
             <input id="searchInput" type="text" name="busqueda" value="{{ request('busqueda') }}" placeholder="Buscar facilitador por nombre, asignatura o contacto" class="search-bar" />
@@ -207,7 +207,7 @@
     </div>
 
     <!-- Modal para mostrar detalles del facilitador -->
-    <div id="modalFacilitador" class="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm hidden">
+    <div id="modalFacilitador" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm hidden">
         <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-8 relative animate-fade-in">
             <button onclick="cerrarModalFacilitador()" class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
             <h2 class="text-2xl font-bold mb-4 text-center">Detalle del Facilitador</h2>
@@ -292,27 +292,32 @@
     </style>
     <script>
         function mostrarModalFacilitador(id) {
-            fetch(`/facilitadores/${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    let materiasHtml = '';
-                    if (data.materias && data.materias.length > 0) {
-                        materiasHtml = data.materias.map(m => `<span class='inline-block bg-indigo-100 text-indigo-800 text-xs font-semibold mr-1 mb-1 px-2.5 py-0.5 rounded'>${m.nombre} (${m.codigo})</span>`).join(' ');
-                    } else {
-                        materiasHtml = `<span class='text-gray-400 text-xs'>Sin materias asignadas</span>`;
-                    }
-                    let html = `
-                        <div><strong>Nombre:</strong> ${data.nombre ?? '-'} </div>
-                        <div><strong>Apellido:</strong> ${data.apellido ?? '-'} </div>
-                        <div><strong>Materias que imparte:</strong> ${materiasHtml}</div>
-                        <div><strong>Teléfono:</strong> ${data.telefono ?? '-'} </div>
-                        <div><strong>Email:</strong> ${data.email ?? '-'} </div>
-                        <div><strong>Estado:</strong> <span class='${data.estado === 'activo' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} px-2 py-1 rounded-full text-xs font-semibold'>${data.estado}</span></div>
-                        <div><strong>Dirección:</strong> ${data.direccion ?? '-'} </div>
-                    `;
-                    document.getElementById('modalFacilitadorContent').innerHTML = html;
-                    document.getElementById('modalFacilitador').classList.remove('hidden');
-                });
+            fetch(`/facilitadores/${id}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let materiasHtml = '';
+                if (data.materias && data.materias.length > 0) {
+                    materiasHtml = data.materias.map(m => `<span class='inline-block bg-indigo-100 text-indigo-800 text-xs font-semibold mr-1 mb-1 px-2.5 py-0.5 rounded'>${m.nombre} (${m.codigo})</span>`).join(' ');
+                } else {
+                    materiasHtml = `<span class='text-gray-400 text-xs'>Sin materias asignadas</span>`;
+                }
+                let html = `
+                    <div><strong>Nombre:</strong> ${data.nombre ?? '-'} </div>
+                    <div><strong>Apellido:</strong> ${data.apellido ?? '-'} </div>
+                    <div><strong>Materias que imparte:</strong> ${materiasHtml}</div>
+                    <div><strong>Teléfono:</strong> ${data.telefono ?? '-'} </div>
+                    <div><strong>Email:</strong> ${data.email ?? '-'} </div>
+                    <div><strong>Estado:</strong> <span class='${data.estado === 'activo' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} px-2 py-1 rounded-full text-xs font-semibold'>${data.estado}</span></div>
+                    <div><strong>Dirección:</strong> ${data.direccion ?? '-'} </div>
+                `;
+                document.getElementById('modalFacilitadorContent').innerHTML = html;
+                document.getElementById('modalFacilitador').classList.remove('hidden');
+            });
         }
         function cerrarModalFacilitador() {
             document.getElementById('modalFacilitador').classList.add('hidden');

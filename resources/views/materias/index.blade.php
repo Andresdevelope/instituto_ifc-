@@ -7,6 +7,32 @@
     <h1 class="text-2xl font-bold mb-4">Listado de Materias</h1>
     <p>Aquí se mostrará la lista de materias.</p>
 
+    {{-- @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong class="font-bold">¡Éxito!</strong>
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif --}}
+    @if(session('success'))
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+                if (window.notyf) {
+                    notyf.success(@json(session('success')));
+                } else if (window.toastr) {
+                    toastr.success(@json(session('success')));
+                } else {
+                    // Si no hay librería, puedes agregar aquí tu propio sistema de notificaciones JS
+                }
+            });
+        </script>
+    @endif
+            <div class="flex justify-end mb-6">
+            <a href="{{ route('materias.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-md shadow transition-all">
+                + Nueva Materia
+            </a>
+        </div>
+
+
     <style>
         .materias-table-container {
             width: 100%;
@@ -136,7 +162,9 @@
                                 <span class="bg-red-200 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">Inactiva</span>
                             @endif
                         </td>
-                        <td>{{ $materia->facilitador->nombre ?? '-' }}</td>
+                        <td>
+                            {{ $materia->facilitador->nombre ?? '-' }}
+                        </td>
                         <td>
                             <div class="flex space-x-2 items-center">
                                 <button type="button" class="action-icon-btn action-view" title="Ver"
@@ -144,6 +172,7 @@
                                     data-codigo="{{ $materia->codigo }}"
                                     data-estado="{{ $materia->estado }}"
                                     data-facilitador="{{ $materia->facilitador->nombre ?? '-' }}"
+                                    data-facilitador-id="{{ $materia->facilitador->id ?? '' }}"
                                     data-descripcion="{{ $materia->descripcion ?? '-' }}"
                                     onclick="mostrarModalMateria(this)">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -151,7 +180,7 @@
                                 <a href="#" class="action-icon-btn action-edit" title="Editar">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 00-4-4l-8 8v3z" /></svg>
                                 </a>
-                                <form action="#" method="POST" style="display:inline; margin:0;">
+                                <form action="{{ route('materias.destroy', $materia->id) }}" method="POST" style="display:inline; margin:0;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="action-icon-btn action-delete" title="Eliminar">
@@ -177,17 +206,28 @@
         </table>
     </div>
 
-    <!-- Modal Detalles Materia -->
+    <!-- Modal Detalles Materia y Facilitador -->
     <div id="modalMateria" class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(60,60,60,0.08)] backdrop-blur-sm transition-all duration-200 hidden">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-7 relative border border-indigo-100">
-            <button onclick="cerrarModalMateria()" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
-            <h2 class="text-xl font-bold mb-4 text-indigo-700">Detalles de la Materia</h2>
-            <div class="space-y-2">
-                <div><span class="font-semibold text-gray-600">Nombre:</span> <span id="modalMateriaNombre"></span></div>
-                <div><span class="font-semibold text-gray-600">Código:</span> <span id="modalMateriaCodigo"></span></div>
-                <div><span class="font-semibold text-gray-600">Estado:</span> <span id="modalMateriaEstado"></span></div>
-                <div><span class="font-semibold text-gray-600">Facilitador:</span> <span id="modalMateriaFacilitador"></span></div>
-                <div><span class="font-semibold text-gray-600">Descripción:</span> <span id="modalMateriaDescripcion"></span></div>
+        <div class="flex gap-6">
+            <!-- Modal Materia -->
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-7 relative border border-indigo-100">
+                <button onclick="cerrarModalMateria()" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
+                <h2 class="text-xl font-bold mb-4 text-indigo-700">Detalles de la Materia</h2>
+                <div class="space-y-2">
+                    <div><span class="font-semibold text-gray-600">Nombre:</span> <span id="modalMateriaNombre"></span></div>
+                    <div><span class="font-semibold text-gray-600">Código:</span> <span id="modalMateriaCodigo"></span></div>
+                    <div><span class="font-semibold text-gray-600">Estado:</span> <span id="modalMateriaEstado"></span></div>
+                    <div><span class="font-semibold text-gray-600">Facilitador:</span> <a id="modalMateriaFacilitadorEnlace" href="#" class="text-indigo-600 hover:underline" onclick="mostrarModalFacilitador(event)"></a></div>
+                    <div><span class="font-semibold text-gray-600">Descripción:</span> <span id="modalMateriaDescripcion"></span></div>
+                </div>
+            </div>
+            <!-- Modal Facilitador Card -->
+            <div id="modalFacilitadorCard" class="hidden bg-white rounded-xl shadow-2xl max-w-xs w-full p-6 relative border border-indigo-100 animate__animated animate__fadeInRight">
+                <button onclick="cerrarModalFacilitador()" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
+                <h3 class="text-lg font-bold mb-3 text-indigo-700">Facilitador</h3>
+                <div class="space-y-2" id="modalFacilitadorContenido">
+                    <div class="text-center text-gray-400">Cargando...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -196,16 +236,81 @@
             document.getElementById('modalMateriaNombre').textContent = btn.getAttribute('data-nombre');
             document.getElementById('modalMateriaCodigo').textContent = btn.getAttribute('data-codigo');
             document.getElementById('modalMateriaEstado').textContent = btn.getAttribute('data-estado');
-            document.getElementById('modalMateriaFacilitador').textContent = btn.getAttribute('data-facilitador');
             document.getElementById('modalMateriaDescripcion').textContent = btn.getAttribute('data-descripcion');
+            // Enlace facilitador
+            var facilitadorId = btn.getAttribute('data-facilitador-id');
+            var facilitadorNombre = btn.getAttribute('data-facilitador');
+            var enlace = document.getElementById('modalMateriaFacilitadorEnlace');
+            enlace.setAttribute('data-facilitador-id', facilitadorId);
+            if (facilitadorId && facilitadorNombre && facilitadorNombre !== '-') {
+                enlace.href = '#';
+                enlace.textContent = facilitadorNombre;
+                enlace.style.pointerEvents = 'auto';
+                enlace.style.color = '#4f46e5';
+            } else {
+                enlace.href = '#';
+                enlace.textContent = '-';
+                enlace.style.pointerEvents = 'none';
+                enlace.style.color = '#6b7280';
+            }
+            document.getElementById('modalFacilitadorCard').classList.add('hidden');
             document.getElementById('modalMateria').classList.remove('hidden');
         }
         function cerrarModalMateria() {
             document.getElementById('modalMateria').classList.add('hidden');
+            document.getElementById('modalFacilitadorCard').classList.add('hidden');
+        }
+        // Modal facilitador
+        function mostrarModalFacilitador(event) {
+            event.preventDefault();
+            var enlace = event.target;
+            var facilitadorId = enlace.getAttribute('data-facilitador-id');
+            if (!facilitadorId) return;
+            var card = document.getElementById('modalFacilitadorCard');
+            var contenido = document.getElementById('modalFacilitadorContenido');
+            card.classList.remove('hidden');
+            contenido.innerHTML = '<div class="text-center text-gray-400">Cargando...</div>';
+            fetch('/facilitadores/' + facilitadorId)
+                .then(resp => resp.text())
+                .then(html => {
+                    var temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    var main = temp.querySelector('main') || temp;
+                    contenido.innerHTML = main.innerHTML;
+                })
+                .catch(() => {
+                    contenido.innerHTML = '<div class="text-center text-red-400">No se pudo cargar el facilitador.</div>';
+                });
+        }
+        function cerrarModalFacilitador() {
+            document.getElementById('modalFacilitadorCard').classList.add('hidden');
         }
         // Cerrar modal con ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') cerrarModalMateria();
         });
+        function mostrarModalFacilitadorDesdeTabla(event, facilitadorId, facilitadorNombre) {
+            event.preventDefault();
+            // Si el modal de materia no está abierto, ábrelo vacío
+            if (document.getElementById('modalMateria').classList.contains('hidden')) {
+                document.getElementById('modalMateria').classList.remove('hidden');
+            }
+            var card = document.getElementById('modalFacilitadorCard');
+            var contenido = document.getElementById('modalFacilitadorContenido');
+            card.classList.remove('hidden');
+            card.style.transform = 'translateX(0)';
+            contenido.innerHTML = '<div class="text-center text-gray-400">Cargando...</div>';
+            fetch('/facilitadores/' + facilitadorId)
+                .then(resp => resp.text())
+                .then(html => {
+                    var temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    var main = temp.querySelector('main') || temp;
+                    contenido.innerHTML = main.innerHTML;
+                })
+                .catch(() => {
+                    contenido.innerHTML = '<div class="text-center text-red-400">No se pudo cargar el facilitador.';
+                });
+        }
     </script>
 @endsection

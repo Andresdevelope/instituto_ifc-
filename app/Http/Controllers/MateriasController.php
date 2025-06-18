@@ -19,17 +19,28 @@ class MateriasController extends Controller
         $facilitadores = Facilitador::orderBy('nombre')->get();
 
         // Filtros
+        //porque para hacer un filtro se necesita una consulta a la base de datos y poner un query?
+        // Crear una consulta base para las materias
+        //porque se usa Materia::query() en lugar de Materia::all()?
+        // porque Materia::query() permite construir una consulta más compleja y flexible, mientras que Materia::all() obtiene todos los registros sin filtros.
         $query = Materia::query();
 
         // Búsqueda por nombre o código
         if ($request->filled('busqueda')) {
             $busqueda = $request->input('busqueda');
             $query->where(function($q) use ($busqueda) {
+                // que significa el uso de "use" en la función anónima y _$q?
+                // El uso de "use" permite que la función anónima acceda a la variable $busqueda definida fuera de su ámbito.
+                // _$q es una instancia de la consulta que se está construyendo, y se usa para agregar condiciones a esa consulta.
+                // porque se usa y que es el "like" en la consulta?
+                // El "like" se usa para buscar coincidencias parciales en los campos 'nombre' y 'codigo'.
                 $q->where('nombre', 'like', "%$busqueda%")
                   ->orWhere('codigo', 'like', "%$busqueda%" );
             });
         }
         // Filtro por estado
+        // porque se usa $request->filled('estado')?
+        // porque $request->filled('estado') verifica si el campo 'estado' está presente y no está vacío en la solicitud.
         if ($request->filled('estado')) {
             $query->where('estado', $request->input('estado'));
         }
@@ -48,7 +59,9 @@ class MateriasController extends Controller
      */
     public function create()
     {
-        return response()->json(['message' => 'Mostrar formulario para crear materia']);
+        // Obtener todos los facilitadores para el select
+        $facilitadores = Facilitador::orderBy('nombre')->get();
+        return view('materias.create', compact('facilitadores'));
     }
 
     /**
@@ -121,6 +134,7 @@ class MateriasController extends Controller
         $materia = Materia::findOrFail($id);
         $materia->delete();
 
-        return response()->json(['message' => 'Materia eliminada exitosamente']);
+        // Redirigir con notificación flash en vez de JSON
+        return redirect()->route('materias.index')->with('success', 'Materia eliminada exitosamente');
     }
 }
